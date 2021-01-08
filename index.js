@@ -13,9 +13,11 @@ bot.on("ready", function (){
     console.log("Bot started, logged in as: " + bot.username);
 });
 
-bot.on('message', function (user, userID, channelID, message, evt) {
 
-    console.log(user + " sent message: " + message);
+
+
+bot.on('message', function (user, userID, channelID, message, evt, url) {
+
 
     if (message.substring(0, 1) === prefix ){
 
@@ -24,8 +26,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         args = args.splice(1);
         switch (cmd){
             case "submission":
+                say(channelID, `https://discord.com/channels/${evt.d.guild_id}/${evt.d.channel_id}/${evt.d.id}`);
                 say(channelID, "submission completed!");
-                //say(channelID, Discord.message.url);
                 break;
             case "bind":
                 say(channelID, "RecordsBot will now send submissions to ", );
