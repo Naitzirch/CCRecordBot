@@ -25,7 +25,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         switch (cmd){
             case "submission":
                 say(channelID, "submission completed!");
-                say(channelID, Discord.message.);
+                //say(channelID, Discord.message.);
                 break;
             case "bind":
                 say(channelID, "RecordsBot will now send submissions to ", );
