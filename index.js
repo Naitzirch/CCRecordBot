@@ -1,3 +1,8 @@
+//Main file
+//Author: Christian Martens
+//Last update: 09/01/2021
+//version 1.0
+
 const Discord = require('discord.io');
 const low = require('lowdb');
 const fs = require('fs');
