@@ -39,11 +39,12 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         bind = data; //read channelID from file
                         //say(bind, ``);
 
-                        if (args.length > 1) {
+                        if (args.length > 2) {
 
                             let IGN = args[0];
                             let GM = args[1];
-                            args.splice(0, 2);
+                            let forumLink = args[2];
+                            args.splice(0, 3);
                             message = args.join(" ");
                             bot.sendMessage({
                                 to: bind,
@@ -54,7 +55,9 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     fields: [{
                                         name: "Details",
                                         value: `IGN: **${IGN}**\n` +
-                                            `Game-mode: **${GM}**\n\n`
+                                            `Game-mode: **${GM}**\n` +
+                                            `[${evt.d.author.username}'s forums profile](${forumLink})\n\n`
+
                                     },
                                         {
                                             name: "Message:",
@@ -125,10 +128,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             value: "$help\n" +
                                 "- Displays this information panel.\n\n" +
 
-                                "$submit [IGN] [Game-mode] [Your message] [evidence]\n" +
-                                "- Submit your record! \n" +
+                                "$submit [IGN] [Game-mode] [forum profile link] [Your message] [evidence]\n" +
+                                "- Submit your record! \n\n" +
                                 "Example of usage:\n" +
-                                "`$submit rubik_cube_man Parkour Fastest time Barn 1 5:232s [evidence]`\n\n"
+                                "`$submit rubik_cube_man Parkour https://www.cubecraft.net/members/rubik_cube_man.5/ \nFastest time Barn 1 5:232s [evidence]`\n\n"
 
 
                         } //You can put [masked links](http://google.com) inside of rich embeds.
