@@ -26,13 +26,29 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         let cmd = args[0];
         args = args.splice(1);
         switch (cmd){
-            case "submission":
+            case "submit":
 
                     if (fs.existsSync(path)) { //check if file exists
                         fs.readFile(path, 'utf8', function(err, data) {
                             if (err) throw err;
                             bind = data; //read channelID from file
-                            say(bind, `https://discord.com/channels/${evt.d.guild_id}/${evt.d.channel_id}/${evt.d.id}`);
+                            //say(bind, ``);
+                            bot.sendMessage({
+                               to: bind,
+                               message: '',
+                               embed: {
+                                   color: 0xfecc52,
+                                   title: `New submission by ${evt.d.author.username}`,
+                                   fields: [{
+                                       name: "Details",
+                                       value:   `IGN: **data**\n` +
+                                                `Game-mode: **GM**\n\n` +
+
+                                                `[**Click here to view their submission**](https://discord.com/channels/${evt.d.guild_id}/${evt.d.channel_id}/${evt.d.id})`
+                                       }
+                                   ]
+                               }
+                            });
                             say(channelID, "submission completed!");
                         });
                     }
@@ -40,7 +56,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         say(channelID, "Error: I am not bound to any channel yet! use $bind to define the output channel.")
                     }
                 break;
-            case "bind":
+            case "bind": //save a file with the channelID
                 fs.writeFile(path, channelID, function(err) {
                     if(err) {
                         return console.log(err);
@@ -50,7 +66,37 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 });
                 break;
             case "help":
-                say(channelID, "Help message");
+                bot.sendMessage({
+                    to: channelID,
+                    message: '',
+                    embed: {
+                        color: 0xfecc52,
+                        title: 'RecordBot help',
+                        //url: 'https://cubecraft.net'
+                        fields: [{
+                            name: "Commands",
+                            value:  "$help\n" +
+                                    "- Displays all available commands.\n\n" +
+
+                                    "$submit [IGN] [Game-mode]\n" +
+                                    "- Submit your record! \n" +
+                                    "Example of usage:\n" +
+                                    "`$submit rubik_cube_man Parkour`\n\n" +
+
+                                    "$bind\n" +
+                                    "Used to bind to submission queue.\n"
+
+                            }, //You can put [masked links](http://google.com) inside of rich embeds.
+                            {
+                                name: "CubeCraft Book of World Records",
+                                value: "[Here](https://www.cubecraft.net/threads/cubecraft-book-of-world-records-revamping.213611/) your records are displayed after they have been reviewed and accepted."
+                            }
+                        ],
+                        footer: {
+                            text: 'Footer'
+                        }
+                    }
+                })
                 break;
         }
     }
