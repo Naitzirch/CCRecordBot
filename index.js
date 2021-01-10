@@ -1,6 +1,6 @@
 //Main file
 //Author: Christian Martens
-//Last update: 09/01/2021
+//Last update: 10/01/2021
 //version 1.0
 
 const Discord = require('discord.io');
@@ -131,7 +131,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 "$submit [IGN] [Game-mode] [forum profile link] [Your message] [evidence]\n" +
                                 "- Submit your record! \n\n" +
                                 "Example of usage:\n" +
-                                "`$submit rubik_cube_man Parkour https://www.cubecraft.net/members/rubik_cube_man.5/ \nFastest time Barn 1 5:232s [evidence]`\n\n"
+                                "`$submit rubik_cube_man Parkour https://www.cubecraft.net/members/rubik_cube_man.5/ " +
+                                "\nFastest time Barn 1 5:232s [evidence]`\n\n"
 
 
                         } //You can put [masked links](http://google.com) inside of rich embeds.
