@@ -24,6 +24,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
     if (message.substring(0, 1) === prefix) {
 
+        let badUsage;
+
         let path = "tmp/bind.txt"; //path where channel id is saved
         let bind;
         let args = message.substring(1).split(" ");
@@ -45,14 +47,24 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
                             let linkIndex;
                             let argsValue;
-                            let cubeCraftLink = "https://www.cubecraft.net/"
+                            let cubeCraftLink = "https://www.cubecraft.net/members/"
                             //check at what index the element has a substring of cubeCraftLink
                             for (linkIndex = 1; linkIndex < args.length; ++linkIndex){
                                 argsValue = args[linkIndex];
                                 if (argsValue.substring(0,cubeCraftLink.length) === cubeCraftLink) {
+                                    badUsage = false;
                                     break; //stop when you've got the index of the link
+                                } else {
+                                    badUsage = true;
                                 }
                             }
+
+                            if (badUsage){
+                                console.log(linkIndex)
+                                say(channelID, "Make sure to include the link to your forums profile!");
+                                return;
+                            }
+
                             let forumLink = args[linkIndex];
 
                             let GM = args.splice(0, linkIndex); //Get all the words upto the forum link and remove them from args
@@ -78,7 +90,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                                 `\n\n[**Click here to view their submission**](https://discord.com/channels/${evt.d.guild_id}/${evt.d.channel_id}/${evt.d.id})`
                                         }
                                     ],
-                                    timestamp: new Date()
+                                    timestamp: new Date(),
+                                    footer: {
+                                        text: "Don't forget to delete this message after reviewing!"
+                                    }
                                 }
                             });
                             say(channelID, `Your submission will be reviewed! <@${userID}>`);
