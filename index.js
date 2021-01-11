@@ -1,7 +1,7 @@
 //Main file
 //Author: Christian Martens
 //Last update: 10/01/2021
-//version 1.0
+//version 1.1
 
 const Discord = require('discord.io');
 const low = require('lowdb');
@@ -10,7 +10,7 @@ const FileSync = require('lowdb/adapters/FileSync');
 
 let prefix = "$";
 const bot = new Discord.Client({
-    token: "Nzk3MTY1NTcwOTMxOTQ5NTcy.X_igSg.3mXyoZF-xmUjQf013dIpQPREkIA", //DONT USE THE SAME TOKEN AFTER DEPLOYMENT
+    token: "Nzk3ODc3MjI5MDczNDY1NDY1.X_s3Ew.Xpx9BM8_ZE2IsLnFkle6r0BjQUw", //DONT USE THE SAME TOKEN AFTER DEPLOYMENT
     autorun: true
 });
 
@@ -29,7 +29,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         let args = message.substring(1).split(" ");
         let cmd = args[0];
         args = args.splice(1);
-        //console.log(args);
         switch (cmd) {
             case "submit":
 
@@ -41,11 +40,25 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
                         if (args.length > 2) {
 
-                            let IGN = args[0];
-                            let GM = args[1];
-                            let forumLink = args[2];
-                            args.splice(0, 3);
-                            message = args.join(" ");
+                            let IGN = args[0]; //first element is IGN
+                            args = args.splice(1); //remove IGN from array
+
+                            let linkIndex;
+                            let argsValue;
+                            let cubeCraftLink = "https://www.cubecraft.net/"
+                            //check at what index the element has a substring of cubeCraftLink
+                            for (linkIndex = 1; linkIndex < args.length; ++linkIndex){
+                                argsValue = args[linkIndex];
+                                if (argsValue.substring(0,cubeCraftLink.length) === cubeCraftLink) {
+                                    break; //stop when you've got the index of the link
+                                }
+                            }
+                            let forumLink = args[linkIndex];
+
+                            let GM = args.splice(0, linkIndex); //Get all the words upto the forum link and remove them from args
+                            GM = GM.join(" ");
+                            args = args.splice(1); //remove forums link from args
+                            message = args.join(" "); //join the rest of args as the message
                             bot.sendMessage({
                                 to: bind,
                                 message: '',
@@ -64,7 +77,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                             value: message +
                                                 `\n\n[**Click here to view their submission**](https://discord.com/channels/${evt.d.guild_id}/${evt.d.channel_id}/${evt.d.id})`
                                         }
-                                    ]
+                                    ],
+                                    timestamp: new Date()
                                 }
                             });
                             say(channelID, `Your submission will be reviewed! <@${userID}>`);
@@ -112,6 +126,16 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     });
                 }
                 break;
+            case "link":
+                bot.sendMessage({
+                    to: channelID,
+                    message: '',
+                    embed: {
+                        title: "CubeCraft Book of World Records",
+                        url: "https://www.cubecraft.net/threads/cubecraft-book-of-world-records-revamping.213611/"
+                    }
+                })
+                break;
             case "help":
                 bot.sendMessage({
                     to: channelID,
@@ -132,7 +156,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 "- Submit your record! \n\n" +
                                 "Example of usage:\n" +
                                 "`$submit rubik_cube_man Parkour https://www.cubecraft.net/members/rubik_cube_man.5/ " +
-                                "\nFastest time Barn 1 5:232s [evidence]`\n\n"
+                                "\nFastest time Barn 1 5:232s [evidence]`\n\n" +
+
+                                "$link\n" +
+                                "- Sends a link to the CCG Records Thread."
 
 
                         } //You can put [masked links](http://google.com) inside of rich embeds.
