@@ -28,7 +28,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
         let path = "tmp/bind.txt"; //path where channel id is saved
         let bind;
-        let args = message.substring(1).split(" ");
+        let args = message.substring(1).split(/[ \n]/);
         let cmd = args[0];
         args = args.splice(1);
         switch (cmd) {
@@ -60,7 +60,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             }
 
                             if (badUsage){
-                                console.log(linkIndex)
                                 say(channelID, "Make sure to include the link to your forums profile!");
                                 return;
                             }
