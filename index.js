@@ -11,9 +11,9 @@ const FileSync = require('lowdb/adapters/FileSync');
 const adapter = new FileSync('db.json')
 const db = low(adapter)
 
-const fs = require('fs');
+//const fs = require('fs');
 
-db.defaults({ botInfo: {}, users: [], help: {} })
+db.defaults({ botInfo: {}, help: [] , users: []})
     .write()
 
 
@@ -35,15 +35,19 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
         let badUsage;
 
-        let path = "tmp/bind.txt"; //path where channel id is saved
         let bind;
         let args = message.substring(1).split(/[ \n]/);
         let cmd = args[0];
         args = args.splice(1);
         switch (cmd) {
             case "submit":
+                if (db.get('botInfo.channelID').value()){
+                    bind = db.get('botInfo.channelID').value(); //read channelID from db
+                } else {
+                    say(channelID, "Error: I am not bound to any channel yet! use $bind to define the output channel.");
+                    return;
+                }
 
-                bind = db.get('botInfo.channelID').value(); //read channelID from db
 
                 let IGN
                 let forumLink
@@ -91,11 +95,18 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     args = args.splice(1); //remove forums link from args
                     message = args.join(" "); //join the rest of args as the message
 
-                    say(channelID, `Your submission will be reviewed! <@${userID}>`);
+
                 } else {
                     say(channelID, "Not enough arguments. Use `$help` to see proper usage.");
                     return;
                 }
+
+                say(channelID, `Your submission will be reviewed! <@${userID}>`);
+
+                let submissions = db.get('botInfo.submissions').value();
+                submissions = submissions + 1;
+                db.set('botInfo.submissions', submissions)
+                    .write()
 
                 bot.sendMessage({
                     to: bind,
@@ -122,44 +133,35 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         }
                     }
                 });
-                /*else {
-                    say(channelID, "Error: I am not bound to any channel yet! use $bind to define the output channel.")
-                }*/
+                break;
+            case "submissions":
+            case "subs":
+                let subs = db.get('botInfo.submissions').value();
+                say(channelID, `${subs} submissions have been made since March 17 2021!`);
                 break;
             case "bind": //save a file with the channelID
                 let roleArr = evt.d.member.roles; //check what roles the user has
-                let rolePath = "tmp/role.txt";
+                let savedRole = db.get('botInfo.role').value();
 
-                if (fs.existsSync(rolePath)) { //check if role file exists
-                    fs.readFile(rolePath, 'utf8', function (err, savedRole) {
-                        if (err) throw err;
+                //check if the querying user has the role
+                if (roleArr.includes(savedRole) || savedRole === "undefined") {
+                    if (typeof args[0] !== 'undefined') { //Check if there is an argument
 
-                        //check if the querying user has the role
-                        if (roleArr.includes(savedRole) || savedRole === "undefined") {
-                            if (typeof args[0] !== 'undefined') { //Check if there is an argument
+                        let role = args[0].substring(3, args[0].length - 1);
 
-                                let role = args[0].substring(3, args[0].length - 1);
+                        db.set('botInfo.role', role)
+                            .write();
+                        console.log("Role has been saved.");
+                        say(channelID, `Only <@&${role}> will now be able to use the bind command.`);
 
-                                fs.writeFile(rolePath, role, function (err) { //save their role id
-                                    if (err) {
-                                        return console.log(err);
-                                    }
-                                    console.log("The file was saved.");
-                                    say(channelID, `Only <@&${role}> will now be able to use the bind command.`);
-                                });
-                            } else {
-                                fs.writeFile(path, channelID, function (err) {
-                                    if (err) {
-                                        return console.log(err);
-                                    }
-                                    console.log("The file was saved.");
-                                    say(channelID, `RecordBot will now send submissions to <#${channelID}>`);
-                                });
-                            }
-                        } else {
-                            say(channelID, "You do not have permission to use this command.");
-                        }
-                    });
+                    } else {
+                        db.set('botInfo.channelID', channelID)
+                            .write();
+                        console.log("channelID has been stored.");
+                        say(channelID, `RecordBot will now send submissions to <#${channelID}>`);
+                    }
+                } else {
+                    say(channelID, "You do not have permission to use this command.");
                 }
                 break;
             case "form":
