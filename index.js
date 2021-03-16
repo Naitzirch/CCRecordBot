@@ -188,6 +188,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     let argsValue;
                     let cubeCraftLink = "https://www.cubecraft.net/members/"
                     let forumLink
+                    let badUsage
                     //check at what index the element has a substring of cubeCraftLink
                     for (linkIndex = 0; linkIndex < args.length; ++linkIndex) {
                         argsValue = args[linkIndex];
@@ -199,8 +200,16 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             }
                             forumLink = argsValue;
                             args.splice(linkIndex, 1)
+                            badUsage = false;
                             break; //stop when you've got the index of the link
+                        } else {
+                            badUsage = true;
                         }
+                    }
+
+                    if (badUsage){
+                        say(channelID, "Make sure to include the link to your forums profile!");
+                        return;
                     }
 
                     let IGN = args.join(" ");
