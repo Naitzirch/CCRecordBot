@@ -1,7 +1,7 @@
 //Main file
 //Author: Christian Martens
-//Last update: 16/03/2021
-//version 1.2
+//Last update: 17/03/2021
+//version 1.3
 
 const Discord = require('discord.io');
 
