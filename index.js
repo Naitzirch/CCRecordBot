@@ -261,7 +261,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 "- Sends a link to a google form through which you can submit your record too!\n\n" +
 
                                 "$link\n" +
-                                "- Sends a link to the CCG Records Thread."
+                                "- Sends a link to the CCG Records Thread.\n\n" +
+
+                                "$connect [In-Game Name] [Forums link]\n" +
+                                "- Allows you to link your account for easier submissions."
 
 
                         } //You can put [masked links](http://google.com) inside of rich embeds.
