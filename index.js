@@ -40,6 +40,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         let cmd = args[0];
         args = args.splice(1);
         switch (cmd) {
+            case "Submit":
             case "submit":
                 if (db.get('botInfo.channelID').value()){
                     bind = db.get('botInfo.channelID').value(); //read channelID from db
