@@ -35,14 +35,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
         if (message.substring(1, 4) === "say") {
             let args = message.substring(1).split(" ");
-            console.log(args);
             args = args.splice(1);
-            console.log(args);
             let channel = args[0].substring(2, args[0].length - 1);
             args = args.splice(1);
             let content = args.join(" ");
-            console.log(channel);
-            console.log(content);
             say(channel, content);
             return;
         }
