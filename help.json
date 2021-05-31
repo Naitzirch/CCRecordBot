@@ -1,0 +1,60 @@
+{
+  "commandInfo": [
+    {
+      "command": "help",
+      "name": "help <command>",
+      "description": "Displays information about a command.",
+      "aliases": "none",
+      "example": "help submit"
+    },
+    {
+      "command": "submit",
+      "name": "submit [IGN] [Game-mode] [forum profile link] [Your message] <evidence>",
+      "description": "Submit your record!\nEvidence may be sent after your submission.\n\nConnected accounts may submit by\n`submit [Game-mode] [Your message] <evidence>`\nSee also `connect`",
+      "aliases": "none",
+      "example": "submit rubik_cube_man Parkour https://www.cubecraft.net/members/rubik_cube_man.5/ Fastest time Barn 1 5:232s"
+    },
+    {
+      "command": "form",
+      "name": "form",
+      "description": "Sends a link to a google form through which you can submit your record too!",
+      "aliases": "none",
+      "example": "form"
+    },
+    {
+      "command": "link",
+      "name": "link",
+      "description": "Sends a link to the CCG Records Thread.",
+      "aliases": "none",
+      "example": "link"
+    },
+    {
+      "command": "connect",
+      "name": "connect [In-Game Name] [Forums link]",
+      "description": "Allows you to link your account for easier submissions.\n",
+      "aliases": "none",
+      "example": "connect Naitzirch https://www.cubecraft.net/members/naitzirch.375456/"
+    },
+    {
+      "command": "accept",
+      "name": "accept [Submission code]",
+      "description": "Used to accept a submission.\nWhen this command is executed the submission owner gets pinged about their submission status and the submission is automatically removed from the queue.",
+      "aliases": "ac",
+      "example": "accept 1234"
+    },
+    {
+      "command": "deny",
+      "name": "deny [Submission code] <feedback>",
+      "description": "Used to deny a submission.\nWhen this command is executed the submission owner gets pinged about their submission status and the submission is automatically removed from the queue.",
+      "aliases": "dn",
+      "example": "deny 1234 We require video evidence for Parkour records :^)"
+    },
+    {
+      "command": "bind",
+      "name": "bind",
+      "description": "bind queue - to define #queue channel\nbind feedback - to define feedback channel\nbind @role - set perms for who can use the bind command",
+      "aliases": "none",
+      "example": "bind feedback"
+    }
+  ]
+}

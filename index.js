@@ -14,10 +14,16 @@ const db = low(adapter);
 const adapter2 = new FileSync('queue.json');
 const queue = low(adapter2);
 
+const adapter3 = new FileSync('help.json');
+const help = low(adapter3);
+
 db.defaults({ botInfo: {}, help: [] , users: []})
     .write()
 
 queue.defaults({ submissions: []})
+    .write()
+
+help.defaults({ commandInfo: []})
     .write()
 
 const bot = new Discord.Client({
@@ -307,11 +313,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 embed: {
                                     color: 0xfecc52,
                                     title: `Staff Feedback`,
-                                    fields: [{
-                                        name: "Details",
-                                        value: message
-
-                                    }],
+                                    description: message,
                                     timestamp: new Date(),
                                 }
                             });
@@ -330,45 +332,89 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             }
                 break;
             case "help":
-                bot.sendMessage({
-                    to: channelID,
-                    message: '',
-                    embed: {
-                        color: 0xfecc52,
-                        title: 'RecordBot help',
-                        //url: 'https://cubecraft.net'
-                        description:
-                            "[**CubeCraft Book of World Records**](https://www.cubecraft.net/threads/cubecraft-book-of-world-records-revamping.213611/)" +
-                            "\nThis is where your records are displayed after they have been reviewed and accepted.\n\n",
-                        fields: [{
-                            name: "Commands",
-                            value: "$help\n" +
-                                "- Displays this information panel.\n\n" +
 
-                                "$submit [IGN] [Game-mode] [forum profile link] [Your message] [evidence]\n" +
-                                "- Submit your record! \n\n" +
-                                "Example of usage:\n" +
-                                "`$submit rubik_cube_man Parkour https://www.cubecraft.net/members/rubik_cube_man.5/ " +
-                                "\nFastest time Barn 1 5:232s [evidence]`\n\n" +
+                let command = args[0];
 
-                                "$form\n" +
-                                "- Sends a link to a google form through which you can submit your record too!\n\n" +
+                if (command && command !== "mod") {
+                    let commandInfo = help.get('commandInfo').find({command: command}).value();
 
-                                "$link\n" +
-                                "- Sends a link to the CCG Records Thread.\n\n" +
-
-                                "$connect [In-Game Name] [Forums link]\n" +
-                                "- Allows you to link your account for easier submissions."
-
-
-                        } //You can put [masked links](http://google.com) inside of rich embeds.
-
-                        ],
-                        footer: {
-                            text: ''
-                        }
+                    if (commandInfo) {
+                        bot.sendMessage({
+                            to: channelID,
+                            message: '',
+                            embed: {
+                                color: 0xfecc52,
+                                title: prefix + commandInfo.name,
+                                description: commandInfo.description,
+                                fields: [{
+                                    name: "Aliases",
+                                    value: commandInfo.aliases
+                                },
+                                {
+                                    name: "Example",
+                                    value: prefix + commandInfo.example
+                                }],
+                                footer: {
+                                    text: ''
+                                }
+                            }
+                        });
+                    } else {
+                        say(channelID, "This command does not exist!");
                     }
-                })
+
+                } else {
+
+                    if (command === "mod") {
+                        bot.sendMessage({
+                            to: channelID,
+                            message: '',
+                            embed: {
+                                color: 0xfecc52,
+                                fields: [{
+                                    name: "Extra commands",
+                                    value:
+                                        "accept [Submission code]\n" +
+                                        "deny [Submission code] <feedback>\n" +
+                                        "bind"
+                                }]
+                            }
+                        });
+                    }
+
+                    bot.sendMessage({
+                        to: channelID,
+                        message: '',
+                        embed: {
+                            color: 0xfecc52,
+                            title: 'RecordBot help',
+                            description:
+                                `Type \`${prefix}help <command>\` to get additional info about a command.\n` +
+                                "Always provide variables that are between square brackets `[var]`\n" +
+                                "Variables between pointy brackets `<var>` are optional.\n\n" +
+                                `Leave out brackets when typing a command.\n` +
+                                `Example: \`${prefix}help connect\``
+                            ,
+                            fields: [{
+                                name: "Commands",
+                                value:
+                                    "help\n" +
+                                    "submit [IGN] [Game-mode] [forum profile link] [Your message] <evidence>\n" +
+                                    "connect [In-Game Name] [Forums link]\n" +
+                                    "form\n" +
+                                    "link\n"
+
+                            } //You can put [masked links](http://google.com) inside of rich embeds.
+
+                            ],
+                            footer: {
+                                text: ''
+                            }
+                        }
+                    });
+
+                }
+
                 break;
         }
     }
