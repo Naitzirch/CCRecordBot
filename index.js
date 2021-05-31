@@ -8,14 +8,17 @@ const Discord = require('discord.io');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
 
-const adapter = new FileSync('db.json')
-const db = low(adapter)
+const adapter = new FileSync('db.json');
+const db = low(adapter);
 
-//const fs = require('fs');
+const adapter2 = new FileSync('queue.json');
+const queue = low(adapter2);
 
 db.defaults({ botInfo: {}, help: [] , users: []})
     .write()
 
+queue.defaults({ submissions: []})
+    .write()
 
 const bot = new Discord.Client({
     token: db.get('botInfo.token').value(), //Read the bot token from the db
@@ -45,19 +48,24 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
         let badUsage;
 
+        let accept = false;
+
         let bind;
+
+        if (db.get('botInfo.queueChannelID').value()){
+            bind = db.get('botInfo.queueChannelID').value(); //read channelID from db
+        } else {
+            say(channelID, "Error: I am not bound to any channel yet! use $bind to define the output channel.");
+            return;
+        }
+
         let args = message.substring(1).split(/[ \n]/);
         let cmd = args[0];
         args = args.splice(1);
         switch (cmd) {
             case "Submit":
             case "submit":
-                if (db.get('botInfo.channelID').value()){
-                    bind = db.get('botInfo.channelID').value(); //read channelID from db
-                } else {
-                    say(channelID, "Error: I am not bound to any channel yet! use $bind to define the output channel.");
-                    return;
-                }
+
 
 
                 let IGN
@@ -119,6 +127,16 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 db.set('botInfo.submissions', submissions)
                     .write()
 
+                let randomCode = Math.random().toString().substr(2, 4);
+                let taken = queue.get('submissions').find({id: randomCode}).value();
+
+                while(taken) {
+                    randomCode = Math.random().toString().substr(2, 4);
+                    taken = queue.get('submissions').find({id: randomCode}).value();
+                }
+
+                let botMessage;
+
                 bot.sendMessage({
                     to: bind,
                     message: '',
@@ -140,10 +158,17 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         ],
                         timestamp: new Date(),
                         footer: {
-                            text: "Don't forget to delete this message after reviewing!"
+                            text: "Submission code: " + randomCode
                         }
                     }
-                });
+                }, (err, res) => {
+                    botMessage = res.id;
+                    queue.get('submissions')
+                        .push({ id: randomCode, botMessage: botMessage, Uid: userID, IGN: IGN, forums: forumLink, GM: GM, message: message})
+                        .write()
+                    }
+                );
+
                 break;
             case "submissions":
             case "subs":
@@ -156,7 +181,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
                 //check if the querying user has the role
                 if (roleArr.includes(savedRole) || savedRole === "undefined") {
-                    if (typeof args[0] !== 'undefined') { //Check if there is an argument
+                    if (typeof args[0] !== 'undefined' && args[0] !== "queue" && args[0] !== "feedback") { //Check if there is an argument
 
                         let role = args[0].substring(3, args[0].length - 1);
 
@@ -166,10 +191,17 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         say(channelID, `Only <@&${role}> will now be able to use the bind command.`);
 
                     } else {
-                        db.set('botInfo.channelID', channelID)
-                            .write();
-                        console.log("channelID has been stored.");
-                        say(channelID, `RecordBot will now send submissions to <#${channelID}>`);
+                        if (args[0] === "queue") {
+                            db.set('botInfo.queueChannelID', channelID)
+                                .write();
+                            console.log("channelID has been stored.");
+                            say(channelID, `RecordBot will now send submissions to <#${channelID}>`);
+                        } else if (args[0] === "feedback") {
+                            db.set('botInfo.feedbackChannelID', channelID)
+                                .write();
+                            console.log("channelID has been stored.");
+                            say(channelID, `RecordBot will now send feedback to <#${channelID}>`);
+                        }
                     }
                 } else {
                     say(channelID, "You do not have permission to use this command.");
@@ -244,6 +276,56 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 else {
                     say(channelID, "Please include your username and forum link.");
                 }
+                break;
+            case "accept":
+            case "ac":
+                accept = true;
+            case "deny":
+            case "dn":
+            {
+                let feedbackChannel = db.get('botInfo.feedbackChannelID').value();
+                let randomCode = args[0];
+                args = args.splice(1);
+                message = args.join(" ");
+
+                let content = queue.get('submissions').find({id: randomCode}).value();
+                if (content){
+
+                    bot.deleteMessage({
+                        channelID: bind,
+                        messageID: content.botMessage
+                    });
+
+                    if (accept) {
+                        say(feedbackChannel, `✅ <@${content.Uid}> Your submission has been accepted!`);
+                    }
+                    else {
+                        say(feedbackChannel, `❌ <@${content.Uid}> Your submission has been denied :c`);
+                        bot.sendMessage({
+                            to: feedbackChannel,
+                            message: '',
+                            embed: {
+                                color: 0xfecc52,
+                                title: `Staff Feedback`,
+                                fields: [{
+                                    name: "Details",
+                                    value: message
+
+                                }],
+                                timestamp: new Date(),
+                            }
+                        });
+                    }
+
+                    queue.get('submissions')
+                        .remove(queue.get('submissions').find({id: randomCode}))
+                        .write();
+
+                } else {
+                    say(feedbackChannel, "This submission does not exist (anymore).");
+                }
+
+            }
                 break;
             case "help":
                 bot.sendMessage({
