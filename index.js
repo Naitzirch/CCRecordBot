@@ -300,29 +300,31 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         say(feedbackChannel, `✅ <@${content.Uid}> Your submission has been accepted!`);
                     }
                     else {
-                        say(feedbackChannel, `❌ <@${content.Uid}> Your submission has been denied :c`);
-                        bot.sendMessage({
-                            to: feedbackChannel,
-                            message: '',
-                            embed: {
-                                color: 0xfecc52,
-                                title: `Staff Feedback`,
-                                fields: [{
-                                    name: "Details",
-                                    value: message
+                        if (message) {
+                            bot.sendMessage({
+                                to: feedbackChannel,
+                                message: '',
+                                embed: {
+                                    color: 0xfecc52,
+                                    title: `Staff Feedback`,
+                                    fields: [{
+                                        name: "Details",
+                                        value: message
 
-                                }],
-                                timestamp: new Date(),
-                            }
-                        });
+                                    }],
+                                    timestamp: new Date(),
+                                }
+                            });
+                        }
+                        say(feedbackChannel, `❌ <@${content.Uid}> Your submission has been denied :c`);
                     }
 
-                    queue.get('submissions')
-                        .remove(queue.get('submissions').find({id: randomCode}))
+                    queue.get('submissions') // DONT FORGET TO UPDATE THIS
+                        .remove(queue.get('submissions').find({id: randomCode}).value())
                         .write();
 
                 } else {
-                    say(feedbackChannel, "This submission does not exist (anymore).");
+                    say(channelID, "This submission does not exist (anymore).");
                 }
 
             }
