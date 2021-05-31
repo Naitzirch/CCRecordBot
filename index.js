@@ -58,12 +58,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
         let bind;
 
-        if (db.get('botInfo.queueChannelID').value()){
-            bind = db.get('botInfo.queueChannelID').value(); //read channelID from db
-        } else {
-            say(channelID, "Error: I am not bound to any channel yet! use $bind to define the output channel.");
-            return;
-        }
+
 
         let args = message.substring(1).split(/[ \n]/);
         let cmd = args[0];
@@ -72,7 +67,12 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             case "Submit":
             case "submit":
 
-
+                if (db.get('botInfo.queueChannelID').value()){
+                    bind = db.get('botInfo.queueChannelID').value(); //read channelID from db
+                } else {
+                    say(channelID, "Error: I am not bound to any channel yet! use $bind to define the output channel.");
+                    return;
+                }
 
                 let IGN
                 let forumLink
