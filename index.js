@@ -295,6 +295,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 message = args.join(" ");
 
                 let content = queue.get('submissions').find({id: randomCode}).value();
+                bind = db.get('botInfo.queueChannelID').value();
                 if (content){
 
                     bot.deleteMessage({
