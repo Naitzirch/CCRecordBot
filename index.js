@@ -181,6 +181,12 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 let subs = db.get('botInfo.submissions').value();
                 say(channelID, `${subs} submissions have been made since March 17 2021!`);
                 break;
+            case "setMember":
+                let memRole = args[0].substring(3, args[0].length - 1)
+                db.set('botInfo.memberRole', memRole)
+                    .write();
+                say(channelID, `Set member role to <@&${memRole}>.`)
+                break;
             case "bind": //save a file with the channelID
                 let roleArr = evt.d.member.roles; //check what roles the user has
                 let savedRole = db.get('botInfo.role').value();
@@ -268,7 +274,20 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     if (!db.get('users').find({id: userID}).value()){
                         db.get('users')
                             .push({ id: userID, IGN: IGN, forums: forumLink})
-                            .write()
+                            .write();
+
+                        let memberRole = db.get('botInfo.memberRole').value();
+
+                        if (memberRole) {
+                            bot.addToRole({
+                                serverID: bot.channels[channelID].guild_id,
+                                roleID: memberRole,
+                                userID: userID,
+                            }, (err) => {
+                                if (err) console.log(err);
+                            });
+                        }
+
                         say(channelID, "Successfully connected your account!")
                     } else {
                         db.get('users')
@@ -288,6 +307,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 accept = true;
             case "deny":
             case "dn":
+            case "delete":
+            case "del":
             {
                 let feedbackChannel = db.get('botInfo.feedbackChannelID').value();
                 let randomCode = args[0];
@@ -306,23 +327,20 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     if (accept) {
                         say(feedbackChannel, `✅ <@${content.Uid}> Your submission has been accepted!`);
                     }
-                    else {
-                        if (message) {
-                            bot.sendMessage({
-                                to: feedbackChannel,
-                                message: '',
-                                embed: {
-                                    color: 0xfecc52,
-                                    title: `Staff Feedback`,
-                                    description: message,
-                                    timestamp: new Date(),
-                                }
-                            });
-                        }
-                        say(feedbackChannel, `❌ <@${content.Uid}> Your submission has been denied :c`);
+                    else if (message) {
+                        bot.sendMessage({
+                            to: feedbackChannel,
+                            message: `❌ <@${content.Uid}> Your submission has been denied :c`,
+                            embed: {
+                                color: 0xfecc52,
+                                title: `Staff Feedback`,
+                                description: message,
+                                timestamp: new Date(),
+                            }
+                        });
                     }
 
-                    queue.get('submissions') // DONT FORGET TO UPDATE THIS
+                    queue.get('submissions')
                         .remove(queue.get('submissions').find({id: randomCode}).value())
                         .write();
 
@@ -377,7 +395,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     value:
                                         "accept [Submission code]\n" +
                                         "deny [Submission code] <feedback>\n" +
-                                        "bind"
+                                        "delete" +
+                                        "bind" +
+                                        "setMember" +
+                                        "say"
                                 }]
                             }
                         });
@@ -391,7 +412,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             title: 'RecordBot help',
                             description:
                                 `Type \`${prefix}help <command>\` to get additional info about a command.\n` +
-                                "Always provide variables that are between square brackets `[var]`\n" +
+                                "Variables between square brackets `[var]` are required arguments\n" +
                                 "Variables between pointy brackets `<var>` are optional.\n\n" +
                                 `Leave out brackets when typing a command.\n` +
                                 `Example: \`${prefix}help connect\``
@@ -400,8 +421,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 name: "Commands",
                                 value:
                                     "help\n" +
-                                    "submit [IGN] [Game-mode] [forum profile link] [Your message] <evidence>\n" +
-                                    "connect [In-Game Name] [Forums link]\n" +
+                                    "submit\n" +
+                                    "connect\n" +
                                     "form\n" +
                                     "link\n"
 

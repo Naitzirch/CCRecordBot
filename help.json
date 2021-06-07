@@ -44,7 +44,7 @@
     },
     {
       "command": "deny",
-      "name": "deny [Submission code] <feedback>",
+      "name": "deny [Submission code] [feedback]",
       "description": "Used to deny a submission.\nWhen this command is executed the submission owner gets pinged about their submission status and the submission is automatically removed from the queue.",
       "aliases": "dn",
       "example": "deny 1234 We require video evidence for Parkour records :^)"
@@ -55,6 +55,27 @@
       "description": "bind queue - to define #queue channel\nbind feedback - to define feedback channel\nbind @role - set perms for who can use the bind command",
       "aliases": "none",
       "example": "bind feedback"
+    },
+    {
+      "command": "setMember",
+      "name": "setMember [@role]",
+      "description": "Sets the member role for verification.",
+      "aliases": "none",
+      "example": "setMember @Member"
+    },
+    {
+      "command": "say",
+      "name": "say [#channel] <Your message>",
+      "description": "Allows you to let the bot send a message with custom text.",
+      "aliases": "none",
+      "example": "say #general This bot is very cool 😏"
+    },
+    {
+      "command": "delete",
+      "name": "delete [Submission code]",
+      "description": "Deletes a submission without pinging the user.",
+      "aliases": "del",
+      "example": "del 1234"
     }
   ]
 }
