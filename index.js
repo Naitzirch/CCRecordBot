@@ -276,18 +276,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             .push({ id: userID, IGN: IGN, forums: forumLink})
                             .write();
 
-                        let memberRole = db.get('botInfo.memberRole').value();
-
-                        if (memberRole) {
-                            bot.addToRole({
-                                serverID: bot.channels[channelID].guild_id,
-                                roleID: memberRole,
-                                userID: userID,
-                            }, (err) => {
-                                if (err) console.log(err);
-                            });
-                        }
-
                         say(channelID, "Successfully connected your account!")
                     } else {
                         db.get('users')
@@ -295,6 +283,18 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             .assign({IGN: IGN, forums: forumLink})
                             .write()
                         say(channelID, "Successfully updated your credentials.")
+                    }
+
+                    let memberRole = db.get('botInfo.memberRole').value();
+
+                    if (memberRole) {
+                        bot.addToRole({
+                            serverID: bot.channels[channelID].guild_id,
+                            roleID: memberRole,
+                            userID: userID,
+                        }, (err) => {
+                            if (err) console.log(err);
+                        });
                     }
 
                 }
