@@ -35,7 +35,7 @@ bot.on("ready", function () {
 });
 
 let prefix = "$";
-
+let cubeCraftLink = "https://www.cubecraft.net/members/"
 let verification = [];
 
 bot.on('message', function (user, userID, channelID, message, evt) {
@@ -92,7 +92,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
                     let linkIndex;
                     let argsValue;
-                    let cubeCraftLink = "https://www.cubecraft.net/members/"
+
                     //check at what index the element has a substring of cubeCraftLink
                     for (linkIndex = 0; linkIndex < args.length; ++linkIndex){
                         argsValue = args[linkIndex];
@@ -250,7 +250,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 if (args.length > 1){
                     let linkIndex;
                     let argsValue;
-                    let cubeCraftLink = "https://www.cubecraft.net/members/"
                     let forumLink
                     let badUsage
                     //check at what index the element has a substring of cubeCraftLink
@@ -300,6 +299,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             case "verify":
                 let code = args[0];
                 if (!code) {
+                    say(channelID, "Please provide your forums link or submission code see help for more information.");
+                    return;
+                }
+                if (code.substring(0, cubeCraftLink.length) === cubeCraftLink) {
 
                     for (let vCode in verification) {
                         if (verification[vCode][0] === userID) {
@@ -311,7 +314,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     let randomCode = Math.random().toString(36).substr(2, 9);
                     verification.push([userID, randomCode]);
                     say(channelID, "A verification code will be sent to your forums account, this might take a while");
-                    say(db.get('botInfo.verificationChannel').value(), `${evt.d.author.username}: ${randomCode}`);
+                    say(db.get('botInfo.verificationChannel').value(), `${evt.d.author.username}: ${randomCode} ${code}`);
                 } else {
 
                     let verificationCode;
@@ -339,6 +342,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         say(channelID, "The verification code does not match.")
                     }
                 }
+                console.log(verification);
                 break;
             case "accept":
             case "ac":

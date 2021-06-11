@@ -79,8 +79,8 @@
     },
     {
       "command": "verify",
-      "name": "verify <code>",
-      "description": "Use `verify` to request a verification code.\nAfter you received the code use `verify <code>` to gain access to the server.",
+      "name": "verify [forums account link]/[code]",
+      "description": "Use `verify [forums account link]` to request a verification code.\nAfter you received the code use `verify [code]` to gain access to the server.",
       "aliases": "none",
       "example": "verify abc123456"
     },
