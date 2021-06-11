@@ -36,6 +36,7 @@ bot.on("ready", function () {
 
 let prefix = "$";
 
+let verification = [];
 
 bot.on('message', function (user, userID, channelID, message, evt) {
 
@@ -285,22 +286,54 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         say(channelID, "Successfully updated your credentials.")
                     }
 
-                    let memberRole = db.get('botInfo.memberRole').value();
-
-                    if (memberRole) {
-                        bot.addToRole({
-                            serverID: bot.channels[channelID].guild_id,
-                            roleID: memberRole,
-                            userID: userID,
-                        }, (err) => {
-                            if (err) console.log(err);
-                        });
-                    }
-
                 }
                 else {
                     say(channelID, "Please include your username and forum link.");
                 }
+                break;
+            case "verify":
+                let code = args[0];
+                if (!code) {
+
+                    for (let vCode in verification) {
+                        if (verification[vCode][0] === userID) {
+                            verification.splice(vCode, 1);
+                            break;
+                        }
+                    }
+
+                    let randomCode = Math.random().toString(36).substr(2, 9);
+                    verification.push([userID, randomCode]);
+                    say(channelID, "A verification code will be sent to your forums account, this might take a while");
+                    say("852972062078402621", `${evt.d.author.username}: ${randomCode}`);
+                } else {
+
+                    let verificationCode;
+                    let vCode = 0;
+                    for (vCode in verification) {
+                        if (verification[vCode][0] === userID) {
+                            verificationCode = verification[vCode][1];
+                            break;
+                        }
+                    }
+
+                    if (code === verificationCode) {
+                        let memberRole = db.get('botInfo.memberRole').value();
+                        if (memberRole) {
+                            bot.addToRole({
+                                serverID: bot.channels[channelID].guild_id,
+                                roleID: memberRole,
+                                userID: userID,
+                            }, (err) => {
+                                if (err) console.log(err);
+                            });
+                        }
+                        verification.splice(vCode, 1);
+                    } else {
+                        say(channelID, "The verification code does not match.")
+                    }
+                }
+                console.log(verification);
                 break;
             case "accept":
             case "ac":
@@ -384,26 +417,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
                 } else {
 
-                    if (command === "mod") {
-                        bot.sendMessage({
-                            to: channelID,
-                            message: '',
-                            embed: {
-                                color: 0xfecc52,
-                                fields: [{
-                                    name: "Extra commands",
-                                    value:
-                                        "accept [Submission code]\n" +
-                                        "deny [Submission code] <feedback>\n" +
-                                        "delete" +
-                                        "bind" +
-                                        "setMember" +
-                                        "say"
-                                }]
-                            }
-                        });
-                    }
-
                     bot.sendMessage({
                         to: channelID,
                         message: '',
@@ -424,7 +437,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     "submit\n" +
                                     "connect\n" +
                                     "form\n" +
-                                    "link\n"
+                                    "link\n" +
+                                    "verify"
 
                             } //You can put [masked links](http://google.com) inside of rich embeds.
 
@@ -434,6 +448,26 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             }
                         }
                     });
+
+                    if (command === "mod") {
+                        bot.sendMessage({
+                            to: channelID,
+                            message: '',
+                            embed: {
+                                color: 0xfecc52,
+                                fields: [{
+                                    name: "Extra commands",
+                                    value:
+                                        "accept [Submission code]\n" +
+                                        "deny [Submission code] <feedback>\n" +
+                                        "delete\n" +
+                                        "bind\n" +
+                                        "setMember\n" +
+                                        "say"
+                                }]
+                            }
+                        });
+                    }
 
                 }
 

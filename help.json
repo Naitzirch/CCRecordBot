@@ -76,6 +76,13 @@
       "description": "Deletes a submission without pinging the user.",
       "aliases": "del",
       "example": "del 1234"
+    },
+    {
+      "command": "verify",
+      "name": "verify <code>",
+      "description": "Use `verify` to request a verification code.\nAfter you received the code use `verify <code>` to gain access to the server.",
+      "aliases": "none",
+      "example": "verify abc123456"
     }
   ]
 }
