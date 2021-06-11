@@ -186,7 +186,13 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 let memRole = args[0].substring(3, args[0].length - 1)
                 db.set('botInfo.memberRole', memRole)
                     .write();
-                say(channelID, `Set member role to <@&${memRole}>.`)
+                say(channelID, `Set member role to <@&${memRole}>.`);
+                break;
+            case "setVerify":
+                let verChan = args[0].substring(2, args[0].length - 1);
+                db.set('botInfo.verificationChannel', verChan)
+                    .write();
+                say(channelID, `Set verification channel to <#${verChan}>`);
                 break;
             case "bind": //save a file with the channelID
                 let roleArr = evt.d.member.roles; //check what roles the user has
@@ -305,7 +311,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     let randomCode = Math.random().toString(36).substr(2, 9);
                     verification.push([userID, randomCode]);
                     say(channelID, "A verification code will be sent to your forums account, this might take a while");
-                    say("852972062078402621", `${evt.d.author.username}: ${randomCode}`);
+                    say(db.get('botInfo.verificationChannel').value(), `${evt.d.author.username}: ${randomCode}`);
                 } else {
 
                     let verificationCode;
@@ -333,7 +339,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         say(channelID, "The verification code does not match.")
                     }
                 }
-                console.log(verification);
                 break;
             case "accept":
             case "ac":
@@ -463,7 +468,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                         "delete\n" +
                                         "bind\n" +
                                         "setMember\n" +
-                                        "say"
+                                        "setVerify\n" +
+                                        "say\n"
                                 }]
                             }
                         });

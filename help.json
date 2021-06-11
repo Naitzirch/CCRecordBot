@@ -83,6 +83,13 @@
       "description": "Use `verify` to request a verification code.\nAfter you received the code use `verify <code>` to gain access to the server.",
       "aliases": "none",
       "example": "verify abc123456"
+    },
+    {
+      "command": "setVerify",
+      "name": "setVerify [#channel]",
+      "description": "set a channel in which we receive verification codes, this might be temporarily until we can send codes on the forums automatically.",
+      "aliases": "none",
+      "example": "verify #secretchannel"
     }
   ]
 }
