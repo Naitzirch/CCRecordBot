@@ -20,7 +20,7 @@ const help = low(adapter3);
 db.defaults({ botInfo: {}, help: [] , users: []})
     .write()
 
-queue.defaults({ submissions: []})
+queue.defaults({ verification: [], submissions: []})
     .write()
 
 help.defaults({ commandInfo: []})
@@ -36,7 +36,6 @@ bot.on("ready", function () {
 
 let prefix = "$";
 let cubeCraftLink = "https://www.cubecraft.net/members/"
-let verification = [];
 
 bot.on('message', function (user, userID, channelID, message, evt) {
 
@@ -303,30 +302,21 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     return;
                 }
                 if (code.substring(0, cubeCraftLink.length) === cubeCraftLink) {
-
-                    for (let vCode in verification) {
-                        if (verification[vCode][0] === userID) {
-                            verification.splice(vCode, 1);
-                            break;
-                        }
-                    }
-
                     let randomCode = Math.random().toString(36).substr(2, 9);
-                    verification.push([userID, randomCode]);
-                    say(channelID, "A verification code will be sent to your forums account, this might take a while");
-                    say(db.get('botInfo.verificationChannel').value(), `${evt.d.author.username}: ${randomCode} ${code}`);
-                } else {
-
-                    let verificationCode;
-                    let vCode = 0;
-                    for (vCode in verification) {
-                        if (verification[vCode][0] === userID) {
-                            verificationCode = verification[vCode][1];
-                            break;
-                        }
+                    if (queue.get('verification').find({ id: userID}).value()) {
+                        queue.get('verification')
+                            .find({id:userID})
+                            .assign({code: randomCode})
+                            .write();
+                    } else {
+                        queue.get('verification')
+                            .push({ id: userID, code: randomCode})
+                            .write();
                     }
-
-                    if (code === verificationCode) {
+                    say(channelID, "A verification code will be sent to your forums account, this might take a while");
+                    say(db.get('botInfo.verificationChannel').value(), `${evt.d.author.username}:\n${randomCode}\n${code}`);
+                } else {
+                    if (code === queue.get('verification').find({id: userID}).value().code ) {
                         let memberRole = db.get('botInfo.memberRole').value();
                         if (memberRole) {
                             bot.addToRole({
@@ -336,13 +326,14 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             }, (err) => {
                                 if (err) console.log(err);
                             });
+                            queue.get('verification')
+                                .remove(queue.get('verification').find({id: userID}).value())
+                                .write();
                         }
-                        verification.splice(vCode, 1);
                     } else {
                         say(channelID, "The verification code does not match.")
                     }
                 }
-                console.log(verification);
                 break;
             case "accept":
             case "ac":
@@ -365,14 +356,18 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         channelID: bind,
                         messageID: content.botMessage
                     });
+                    console.log(content.message);
+                    let subMessage = content.message.substring(0, 49);
+                    if (content.message.length > 50) { subMessage = subMessage + '...';}
+
 
                     if (accept) {
-                        say(feedbackChannel, `✅ <@${content.Uid}> Your submission has been accepted!`);
+                        say(feedbackChannel, `✅ <@${content.Uid}> Your ${content.GM} submission for "${subMessage}" has been accepted!`);
                     }
                     else if (message) {
                         bot.sendMessage({
                             to: feedbackChannel,
-                            message: `❌ <@${content.Uid}> Your submission has been denied :c`,
+                            message: `❌ <@${content.Uid}> Your ${content.GM} submission for "${subMessage}" has been denied :c`,
                             embed: {
                                 color: 0xfecc52,
                                 title: `Staff Feedback`,
