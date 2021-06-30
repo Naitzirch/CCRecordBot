@@ -181,11 +181,15 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 say(channelID, `${subs} submissions have been made since March 17 2021!`);
                 break;
             case "giveaway":
-                let giveawayMessage = args[1];
-                let cacheChannel = client.channels.cache.get(args[0]);
-                let msg = cacheChannel.messages.fetch(giveawayMessage);
-                let winner = msg.reactions.cache.get('🎉').users.cache.random();
-                say(channelID, "The winner for this giveaway is <@" ,winner.id + "> ! Yay");
+                console.log(args[0], " ", args[1]);
+                let reaction = bot.getReaction({
+                    channelID: args[0],
+                    messageID: args[1],
+                    reaction: "🎉",
+                    limit: "100"});
+                console.log(typeof reaction, " ", reaction);
+                //say(channelID, "The winner for this giveaway is <@" , reaction.userID + "> !");
+                break;
             case "setMember":
                 let memRole = args[0].substring(3, args[0].length - 1)
                 db.set('botInfo.memberRole', memRole)
