@@ -181,6 +181,12 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 let subs = db.get('botInfo.submissions').value();
                 say(channelID, `${subs} submissions have been made since March 17 2021!`);
                 break;
+            case "giveaway":
+                let giveawayMessage = args[1];
+                let cacheChannel = client.channels.cache.get(args[0]);
+                let msg = cacheChannel.messages.fetch(giveawayMessage);
+                let winner = msg.reactions.cache.get('🎉').users.cache.random();
+                say(channelID, "The winner for this giveaway is <@" ,winner.id + ">");
             case "setMember":
                 let memRole = args[0].substring(3, args[0].length - 1)
                 db.set('botInfo.memberRole', memRole)
@@ -487,3 +493,10 @@ function say(channelID, message) {
         message: message
     });
 }
+var getReactedUsers = (message) => {
+    // fetch the users
+    message.reactions.cache.users.fetch().then((users) =>
+     reaction.cache.map((item) => item.users.cache.array())
+    );
+   };
+   
