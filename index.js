@@ -174,7 +174,6 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         .write()
                     }
                 );
-
                 break;
             case "submissions":
             case "subs":
