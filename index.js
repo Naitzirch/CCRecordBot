@@ -185,7 +185,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 let cacheChannel = client.channels.cache.get(args[0]);
                 let msg = cacheChannel.messages.fetch(giveawayMessage);
                 let winner = msg.reactions.cache.get('🎉').users.cache.random();
-                say(channelID, "The winner for this giveaway is <@" ,winner.id + ">");
+                say(channelID, "The winner for this giveaway is <@" ,winner.id + "> ! Yay");
             case "setMember":
                 let memRole = args[0].substring(3, args[0].length - 1)
                 db.set('botInfo.memberRole', memRole)
