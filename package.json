@@ -5,12 +5,8 @@
     "discord.io": "github:izy521/discord.io",
     "fs": "0.0.1-security",
     "lowdb": "^1.0.0",
-<<<<<<< HEAD
-    "xmlhttprequest": "^1.8.0"
-=======
     "node": "^16.4.0",
     "xmlhttprequest": "^1.8.0",
     "superagent": "^6.1.0"
->>>>>>> ac394f784702406e7174ff94cb7dc229d269ff35
   }
 }
