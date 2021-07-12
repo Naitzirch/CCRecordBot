@@ -34,6 +34,7 @@ bot.on("ready", function () {
     console.log("Bot started, logged in as: " + bot.username);
 });
 
+let games = ["Archer Assault", "Assassination", "BlockWars", "BlockWars Bridges", "Battle Zone", "Colony Control", "Competitive Parkour", "Duel", "Solo EggWars", "Team EggWars", "Free For All", "Line Dash", "Solo Lucky Island", "Team Lucky Islands", "MinerWare", "Paintball", "Parkour", "Quake Craft", "Solo Survival Games", "Team Survival Games", "Slime Survival", "Layer Spleef", "Solo SkyWars", "Team SkyWars", "Tower Defence", "Wing Rush"];
 let prefix = "$";
 let cubeCraftLink = "https://www.cubecraft.net/members/"
 
@@ -174,7 +175,10 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                         .write()
                     }
                 );
-
+                break;
+            case "updateLB":
+                say(channelID, "Fetching the latest leaderboard positions from Calorimod!");
+                say(channelID, "```" + httpGetSync("https://api.calorimod.com/bookofrecords") + "```");
                 break;
             case "submissions":
             case "subs":
@@ -487,3 +491,21 @@ function say(channelID, message) {
         message: message
     });
 }
+
+function httpGetSync(theUrl){
+    let channelResponse = "Leaderboard Data: \n";
+    var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("GET", theUrl, false);
+    xmlHttp.setRequestHeader("Authorization", "Bearer SGVsbG8gdGhlcmUhXG5HZW5lcmFsIEtlbm9iaSEgKmt1Y2gga3VjaCpcbllvdSBhcmUgYSBib2xkIG9uZS4K");
+    xmlHttp.onload = function() {
+       var json = JSON.parse(xmlHttp.responseText);
+       for (let i = 0; i < games.length; i++){
+        thisGame = games[i];
+        channelResponse += thisGame + ": " + json[thisGame]["name"] + "\n";
+        }
+    };
+    xmlHttp.send(null);
+    return channelResponse;
+}
+   
