@@ -96,7 +96,7 @@
       "name": "tag on / off",
       "description": "Choose whether you want to be verified about your submission being reviewed or not.",
       "aliases": "none",
-      "example": "verify off"
+      "example": "tag off"
     }
   ]
 }
