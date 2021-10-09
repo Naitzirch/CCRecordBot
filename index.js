@@ -479,7 +479,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     "connect\n" +
                                     "form\n" +
                                     "link\n" +
-                                    "verify"
+                                    "verify" +
+                                    "tag"
 
                             } //You can put [masked links](http://google.com) inside of rich embeds.
 
