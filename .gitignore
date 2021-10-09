@@ -1,3 +1,4 @@
 queue.json
+db.json
 *.bak
 /node_modules
