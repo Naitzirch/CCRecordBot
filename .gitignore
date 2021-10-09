@@ -1,3 +1,3 @@
-.json
-.bak
+queue.json
+*.bak
 /node_modules
