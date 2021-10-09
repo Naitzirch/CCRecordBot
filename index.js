@@ -364,14 +364,29 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     let subMessage = content.message.substring(0, 49);
                     if (content.message.length > 50) { subMessage = subMessage + '...';}
 
-
-                    if (accept) {
+                    let userInfo = db.get('users').find({id: content.Uid}).value();
+                    if (accept && (userInfo.tag || userInfo.tag == null)) {
                         say(feedbackChannel, `✅ <@${content.Uid}> Your ${content.GM} submission for "${subMessage}" has been accepted!`);
+                    }
+                    else if (accept) {
+                        say(feedbackChannel, `✅ ${userInfo.IGN} Your ${content.GM} submission for "${subMessage}" has been accepted!`);
+                    }
+                    else if (message && (userInfo.tag || userInfo.tag == null)) {
+                        bot.sendMessage({
+                            to: feedbackChannel,
+                            message: `❌ <@${content.Uid}> Your ${content.GM} submission for "${subMessage}" has been denied :c`,
+                            embed: {
+                                color: 0xfecc52,
+                                title: `Staff Feedback`,
+                                description: message,
+                                timestamp: new Date(),
+                            }
+                        });
                     }
                     else if (message) {
                         bot.sendMessage({
                             to: feedbackChannel,
-                            message: `❌ <@${content.Uid}> Your ${content.GM} submission for "${subMessage}" has been denied :c`,
+                            message: `❌ ${userInfo.IGN} Your ${content.GM} submission for "${subMessage}" has been denied :c`,
                             embed: {
                                 color: 0xfecc52,
                                 title: `Staff Feedback`,
@@ -390,6 +405,24 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 }
 
             }
+                break;
+            case "tag":
+                switch (args[0]){
+                    case "on":
+                        db.get('users')
+                            .find({id:userID})
+                            .assign({tag: true})
+                            .write();
+                        say(channelID, "You will now be tagged when your submissions are reviewed.");
+                        break;
+                    case "off":
+                        db.get('users')
+                            .find({id:userID})
+                            .assign({tag: false})
+                            .write();
+                        say(channelID, "Tag on submission review is now turned off.");
+                        break;
+                }
                 break;
             case "help":
 
