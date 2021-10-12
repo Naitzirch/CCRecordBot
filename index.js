@@ -365,13 +365,13 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     if (content.message.length > 50) { subMessage = subMessage + '...';}
 
                     let userInfo = db.get('users').find({id: content.Uid}).value();
-                    if (accept && (userInfo.tag || userInfo.tag == null)) {
+                    if (accept && (userInfo == null || userInfo.tag || userInfo.tag == null)) {
                         say(feedbackChannel, `✅ <@${content.Uid}> Your ${content.GM} submission for "${subMessage}" has been accepted!`);
                     }
                     else if (accept) {
                         say(feedbackChannel, `✅ ${userInfo.IGN} Your ${content.GM} submission for "${subMessage}" has been accepted!`);
                     }
-                    else if (message && (userInfo.tag || userInfo.tag == null)) {
+                    else if (message && (userInfo == null || userInfo.tag || userInfo.tag == null)) {
                         bot.sendMessage({
                             to: feedbackChannel,
                             message: `❌ <@${content.Uid}> Your ${content.GM} submission for "${subMessage}" has been denied :c`,
@@ -479,7 +479,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     "connect\n" +
                                     "form\n" +
                                     "link\n" +
-                                    "verify" +
+                                    "verify\n" +
                                     "tag"
 
                             } //You can put [masked links](http://google.com) inside of rich embeds.
