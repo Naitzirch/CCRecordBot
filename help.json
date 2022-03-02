@@ -15,11 +15,11 @@
       "example": "submit rubik_cube_man Parkour https://www.cubecraft.net/members/rubik_cube_man.5/ Fastest time Barn 1 5:232s"
     },
     {
-      "command": "form",
-      "name": "form",
-      "description": "Sends a link to a google form through which you can submit your record too!",
+      "command": "discord",
+      "name": "discord",
+      "description": "Sends you a permanent invite link to the CCWR Discord server.",
       "aliases": "none",
-      "example": "form"
+      "example": "discord"
     },
     {
       "command": "link",

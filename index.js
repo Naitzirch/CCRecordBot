@@ -229,15 +229,9 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     say(channelID, "You do not have permission to use this command.");
                 }
                 break;
-            case "form":
-                bot.sendMessage({
-                    to: channelID,
-                    message: '',
-                    embed: {
-                        title: "CCG Records Form",
-                        url: "https://docs.google.com/forms/d/e/1FAIpQLSeSpzL1aHLTHUSmqNmMCuzlcvxVLiXzs8M_knuzy2ijuDuw4Q/viewform"
-                    }
-                })
+            case "discord":
+            case "Discord":
+                say(channelID, "https://discord.gg/fajtksN");
                 break;
             case "link":
                 bot.sendMessage({
@@ -477,7 +471,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     "help\n" +
                                     "submit\n" +
                                     "connect\n" +
-                                    "form\n" +
+                                    "discord\n" +
                                     "link\n" +
                                     "verify\n" +
                                     "tag"
