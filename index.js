@@ -56,6 +56,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
         let badUsage;
 
         let accept = false;
+        let del = false;
 
         let bind;
 
@@ -143,6 +144,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 }
 
                 let botMessage;
+                let submissionMessage = `https://discord.com/channels/${evt.d.guild_id}/${evt.d.channel_id}/${evt.d.id}`;
 
                 bot.sendMessage({
                     to: bind,
@@ -160,7 +162,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                             {
                                 name: "Message:",
                                 value: message +
-                                    `\n\n[**Click here to view their submission**](https://discord.com/channels/${evt.d.guild_id}/${evt.d.channel_id}/${evt.d.id})`
+                                    `\n\n[**Click here to view their submission**](${submissionMessage})`
                             }
                         ],
                         timestamp: new Date(),
@@ -171,7 +173,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 }, (err, res) => {
                     botMessage = res.id;
                     queue.get('submissions')
-                        .push({ id: randomCode, botMessage: botMessage, Uid: userID, IGN: IGN, forums: forumLink, GM: GM, message: message})
+                        .push({ id: randomCode, botMessage: botMessage, submissionMessage: submissionMessage, Uid: userID, IGN: IGN, forums: forumLink, GM: GM, message: message})
                         .write()
                     }
                 );
@@ -333,13 +335,15 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     }
                 }
                 break;
+            case "delete":
+            case "del":
+                del = true;
             case "accept":
             case "ac":
                 accept = true;
             case "deny":
             case "dn":
-            case "delete":
-            case "del":
+
             {
                 let feedbackChannel = db.get('botInfo.feedbackChannelID').value();
                 let randomCode = args[0];
@@ -350,49 +354,57 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 bind = db.get('botInfo.queueChannelID').value();
                 if (content){
 
-                    bot.deleteMessage({
-                        channelID: bind,
-                        messageID: content.botMessage
-                    });
-                    console.log(content.message);
                     let subMessage = content.message.substring(0, 49);
                     if (content.message.length > 50) { subMessage = subMessage + '...';}
 
-                    let userInfo = db.get('users').find({id: content.Uid}).value();
-                    if (accept && (userInfo == null || userInfo.tag || userInfo.tag == null)) {
-                        say(feedbackChannel, `✅ <@${content.Uid}> Your ${content.GM} submission for "${subMessage}" has been accepted!`);
-                    }
-                    else if (accept) {
-                        say(feedbackChannel, `✅ ${userInfo.IGN} Your ${content.GM} submission for "${subMessage}" has been accepted!`);
-                    }
-                    else if (message && (userInfo == null || userInfo.tag || userInfo.tag == null)) {
-                        bot.sendMessage({
-                            to: feedbackChannel,
-                            message: `❌ <@${content.Uid}> Your ${content.GM} submission for "${subMessage}" has been denied :c`,
-                            embed: {
-                                color: 0xfecc52,
-                                title: `Staff Feedback`,
-                                description: message,
-                                timestamp: new Date(),
-                            }
-                        });
-                    }
-                    else if (message) {
-                        bot.sendMessage({
-                            to: feedbackChannel,
-                            message: `❌ ${userInfo.IGN} Your ${content.GM} submission for "${subMessage}" has been denied :c`,
-                            embed: {
-                                color: 0xfecc52,
-                                title: `Staff Feedback`,
-                                description: message,
-                                timestamp: new Date(),
-                            }
-                        });
+                    let linkToSubmission = "";
+                    if (content.submissionMessage) {
+                        linkToSubmission = `\nLink to your submission: ${content.submissionMessage}`;
                     }
 
-                    queue.get('submissions')
-                        .remove(queue.get('submissions').find({id: randomCode}).value())
-                        .write();
+                    let userInfo = db.get('users').find({id: content.Uid}).value();
+                    if (!del) {
+                        if (accept && (userInfo == null || userInfo.tag || userInfo.tag == null)) {
+                            say(feedbackChannel, `✅ <@${content.Uid}> Your ${content.GM} submission for "${subMessage}" has been accepted!${linkToSubmission}`);
+                        } else if (accept) {
+                            say(feedbackChannel, `✅ ${userInfo.IGN} Your ${content.GM} submission for "${subMessage}" has been accepted!${linkToSubmission}`);
+                        } else if (message && (userInfo == null || userInfo.tag || userInfo.tag == null)) {
+                            bot.sendMessage({
+                                to: feedbackChannel,
+                                message: `❌ <@${content.Uid}> Your ${content.GM} submission for "${subMessage}" has been denied :c${linkToSubmission}`,
+                                embed: {
+                                    color: 0xfecc52,
+                                    title: `Staff Feedback`,
+                                    description: message,
+                                    timestamp: new Date(),
+                                }
+                            });
+                        } else if (message) {
+                            bot.sendMessage({
+                                to: feedbackChannel,
+                                message: `❌ ${userInfo.IGN} Your ${content.GM} submission for "${subMessage}" has been denied :c${linkToSubmission}`,
+                                embed: {
+                                    color: 0xfecc52,
+                                    title: `Staff Feedback`,
+                                    description: message,
+                                    timestamp: new Date(),
+                                }
+                            });
+                        }
+                    }
+
+                    if (!del && !accept && message === "") {
+                        say(channelID, "Please provide feedback as to why this record was denied.");
+                    } else {
+                        bot.deleteMessage({
+                            channelID: bind,
+                            messageID: content.botMessage
+                        });
+
+                        queue.get('submissions')
+                            .remove(queue.get('submissions').find({id: randomCode}).value())
+                            .write();
+                    }
 
                 } else {
                     say(channelID, "This submission does not exist (anymore).");
