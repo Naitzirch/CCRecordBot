@@ -128,7 +128,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                     return;
                 }
 
-                say(channelID, `**Successfully deleted all your records!**  <@${userID}>`);//Your submission will be reviewed!
+                say(channelID, `Your submission will be reviewed! <@${userID}>`);//**Successfully deleted all your records!**
 
                 let submissions = db.get('botInfo.submissions').value();
                 submissions = submissions + 1;
