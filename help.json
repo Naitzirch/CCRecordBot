@@ -25,7 +25,7 @@
       "command": "link",
       "name": "link",
       "description": "Sends a link to the CCG Records Thread.",
-      "aliases": "none",
+      "aliases": "book",
       "example": "link"
     },
     {
@@ -97,6 +97,13 @@
       "description": "Choose whether you want to be verified about your submission being reviewed or not.",
       "aliases": "none",
       "example": "tag off"
+    },
+    {
+      "command": "submissions",
+      "name": "submissions",
+      "description": "Tracks number of submission done.",
+      "aliases": "subs",
+      "example": "subs"
     }
   ]
 }

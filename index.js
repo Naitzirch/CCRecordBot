@@ -205,7 +205,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
                 //check if the querying user has the role
                 if (roleArr.includes(savedRole) || savedRole === "undefined") {
-                    if (typeof args[0] !== 'undefined' && args[0] !== "queue" && args[0] !== "feedback") { //Check if there is an argument
+                    if (typeof args[0] !== 'undefined' && args[0] !== "queue" && args[0] !== "feedback" && args[0] !== "changelog") { //Check if there is an argument
 
                         let role = args[0].substring(3, args[0].length - 1);
 
@@ -225,6 +225,11 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 .write();
                             console.log("channelID has been stored.");
                             say(channelID, `RecordBot will now send feedback to <#${channelID}>`);
+                        } else if (args[0] === "changelog") {
+                            db.set('botInfo.changelogChannelID', channelID)
+                                .write();
+                            console.log("channelID has been stored.");
+                            say(channelID, `RecordBot will now send changelog to <#${channelID}>`);
                         }
                     }
                 } else {
@@ -236,6 +241,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 say(channelID, "https://discord.gg/fajtksN");
                 break;
             case "link":
+            case "book":
                 bot.sendMessage({
                     to: channelID,
                     message: '',
@@ -346,9 +352,15 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
             {
                 let feedbackChannel = db.get('botInfo.feedbackChannelID').value();
+                let changelogChannel = db.get('botInfo.changelogChannelID').value();
                 let randomCode = args[0];
                 args = args.splice(1);
                 message = args.join(" ");
+
+                if (accept && !del && message === "") {
+                    say(channelID, "Who owned this record previously? (type - if no one did)");
+                    return
+                }
 
                 let content = queue.get('submissions').find({id: randomCode}).value();
                 bind = db.get('botInfo.queueChannelID').value();
@@ -391,6 +403,13 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                 }
                             });
                         }
+                        if (accept) {
+                            let newHolderIGN = "Account not connected, see link below";
+                            if (userInfo) {
+                                newHolderIGN = userInfo.IGN;
+                            }
+                            say(changelogChannel, `> ${content.GM}\n> ${subMessage}\n> \n> \`${args[0]} -> ${newHolderIGN}\`\n> \n> ${content.submissionMessage}`);
+                        }
                     }
 
                     if (!del && !accept && message === "") {
@@ -413,6 +432,11 @@ bot.on('message', function (user, userID, channelID, message, evt) {
             }
                 break;
             case "tag":
+                if (!db.get('users')
+                    .find({id:userID}).value()) {
+                    say(channelID, "Connect your account to use this feature, see `$help connect` for more");
+                    return
+                }
                 switch (args[0]){
                     case "on":
                         db.get('users')
@@ -486,7 +510,8 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     "discord\n" +
                                     "link\n" +
                                     "verify\n" +
-                                    "tag"
+                                    "tag" +
+                                    "submissions"
 
                             } //You can put [masked links](http://google.com) inside of rich embeds.
 
