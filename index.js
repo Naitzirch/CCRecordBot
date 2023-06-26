@@ -242,12 +242,23 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 break;
             case "link":
             case "book":
+            case "java":
                 bot.sendMessage({
                     to: channelID,
                     message: '',
                     embed: {
                         title: "CubeCraft Book of World Records",
-                        url: "https://www.cubecraft.net/threads/cubecraft-book-of-world-records-revamping.213611/"
+                        url: "https://www.cubecraft.net/threads/cubecraft-book-of-world-records.344750"
+                    }
+                })
+                break;
+            case "bedrock":
+                bot.sendMessage({
+                    to: channelID,
+                    message: '',
+                    embed: {
+                        title: "CubeCraft Book of World Records",
+                        url: "https://www.cubecraft.net/threads/cubecraft-book-of-world-records.344750/post-1535640"
                     }
                 })
                 break;
