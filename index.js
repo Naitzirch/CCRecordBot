@@ -521,7 +521,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                                     "discord\n" +
                                     "link\n" +
                                     "verify\n" +
-                                    "tag" +
+                                    "tag\n" +
                                     "submissions"
 
                             } //You can put [masked links](http://google.com) inside of rich embeds.
