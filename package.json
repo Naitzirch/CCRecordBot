@@ -7,6 +7,6 @@
     "lowdb": "^1.0.0",
     "node": "^16.4.0",
     "xmlhttprequest": "^1.8.0",
-    "superagent": "^6.1.0"
+    "superagent": "^9.0.1"
   }
 }
